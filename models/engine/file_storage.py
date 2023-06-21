@@ -1,6 +1,16 @@
 #!/usr/bin/python3
-"""This module defines a class to manage file storage for hbnb clone"""
+
+"""
+This module defines a class to manage file storage for hbnb clone
+"""
 import json
+from models.base_model import BaseModel
+from models.user import User
+from models.city import City
+from models.place import Place
+from models.state import State
+from models.review import Review
+from models.amenity import Amenity
 
 
 class FileStorage:
@@ -11,11 +21,9 @@ class FileStorage:
     def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
         if cls is not None:
-            fs_dict = {}
-            for key, value in self.__objects.items():
-                if cls == value.__class__ or cls == value.__class__.__name__:
-                    fs_dict[key] = value
-            return fs_dict
+            if type(cls) == str:
+                cls = eval(cls)
+            return {k: v for k, v in self.__objects.items() if type(v) == cls}
         return self.__objects
 
     def new(self, obj):
@@ -32,36 +40,17 @@ class FileStorage:
             json.dump(temp, f)
 
     def delete(self, obj=None):
-        """delete obj from __objects"""
-        if (obj is None):
-            return
-        if (obj):
-            del(obj)
-        # if (obj is None):
-        #     return
-
-        # key = obj.__class__.__name__ + '.' + obj.id
-
-        # try:
-        #     del(self.all()[key])
-        #     self.save()
-        # except KeyError:
-        #     print("** no instance found **")
+        """Deletes obj from '__objects'"""
+        if obj is not None:
+            key = obj.to_dict()['__class__'] + '.' + obj.id
+            self.all().pop(key, None)
 
     def reload(self):
         """Loads storage dictionary from file"""
-        from models.base_model import BaseModel
-        from models.user import User
-        from models.place import Place
-        from models.state import State
-        from models.city import City
-        from models.amenity import Amenity
-        from models.review import Review
-
         classes = {
-            'BaseModel': BaseModel, 'User': User, 'Place': Place,
-            'State': State, 'City': City, 'Amenity': Amenity,
-            'Review': Review
+            'BaseModel': BaseModel,
+            'User': User, 'Place': Place, 'State': State,
+            'City': City, 'Amenity': Amenity, 'Review': Review
         }
         try:
             temp = {}
@@ -73,5 +62,7 @@ class FileStorage:
             pass
 
     def close(self):
-        """ close method """
+        """
+        Calls reload() method
+        """
         self.reload()
