@@ -1,41 +1,34 @@
 #!/usr/bin/python3
 """
-Fabric script (based on the file 1-pack_web_static.py)
-that distributes an archive to your web servers, using the function do_deploy
+Fabric script to distribute an archive to web servers
 """
-from os import path
-from fabric.api import env, put, run
 
-env.hosts = ["34.231.110.206", "3.239.57.196"]
+from fabric.api import run, put, env
+import os
+
+
+env.hosts = ['<IP web-01>', '<IP web-02>']
 
 
 def do_deploy(archive_path):
     """
-    Distributes archives to web servers
+    Distributes an archive to web servers
     """
-    if not path.exists(archive_path):
+    if not os.path.exists(archive_path):
         return False
-    compressedFile = archive_path.split("/")[-1]
-    fileName = compressedFile.split(".")[0]
-    upload_path = "/tmp/{}".format(compressedFile)
-    if put(archive_path, upload_path).failed:
+
+    try:
+        archive_name = os.path.basename(archive_path)
+        folder_name = "/data/web_static/releases/" + archive_name.split(".")[0]
+        put(archive_path, "/tmp/")
+        run("mkdir -p {}".format(folder_name))
+        run("tar -xzf /tmp/{} -C {}".format(archive_name, folder_name))
+        run("rm /tmp/{}".format(archive_name))
+        run("mv {}/web_static/* {}/".format(folder_name, folder_name))
+        run("rm -rf {}/web_static".format(folder_name))
+        run("rm -rf /data/web_static/current")
+        run("ln -s {} /data/web_static/current".format(folder_name))
+        print("New version deployed!")
+        return True
+    except:
         return False
-    current_release = '/data/web_static/releases/{}'.format(fileName)
-    if run("rm -rf {}".format(current_release)).failed:
-        return False
-    if run("mkdir -p {}".format(current_release)).failed:
-        return False
-    uncompress = "tar -xzf /tmp/{} -C {}".format(
-        compressedFile, current_release
-    )
-    if run(uncompress).failed:
-        return False
-    delete_archive = "rm -f /tmp/{}".format(compressedFile)
-    if run(delete_archive).failed:
-        return False
-    if run("rm -rf /data/web_static/current").failed:
-        return False
-    relink = "ln -s {} /data/web_static/current".format(current_release)
-    if run(relink).failed:
-        return False
-    return True

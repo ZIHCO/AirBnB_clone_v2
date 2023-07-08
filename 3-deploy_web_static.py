@@ -1,72 +1,60 @@
 #!/usr/bin/python3
 """
-Fabric script (based on the file 1-pack_web_static.py)
-that distributes an archive to your web servers, using the function do_deploy
+Fabric script to create and distribute an archive to web servers
 """
-from os import path
-from datetime import datetime
-from fabric.api import env, local, put, run
 
-env.hosts = ["34.231.110.206", "3.239.57.196"]
+from fabric.api import local, run, put, env
+import os
+from datetime import datetime
+
+
+env.hosts = ['<IP web-01>', '<IP web-02>']
 
 
 def do_pack():
     """
-    A function that generates an archive
+    Creates a .tgz archive from the contents of the web_static folder
     """
-    date = datetime.now()
-    archive = "versions/web_static_{}{}{}{}{}{}.tgz".format(
-        date.year, date.month, date.day,
-        date.hour, date.minute, date.second
-    )
-    if not path.isdir("versions"):
-        if local("mkdir versions").failed:
-            return None
-    cmd = "cd web_static && tar -cvzf ../{} . && cd -".format(archive)
-    if local(cmd).succeeded:
-        return archive
-    return None
+    try:
+        current_time = datetime.now().strftime("%Y%m%d%H%M%S")
+        archive_name = "web_static_" + current_time + ".tgz"
+        local("mkdir -p versions")
+        local("tar -czvf versions/{} web_static".format(archive_name))
+        return "versions/{}".format(archive_name)
+    except:
+        return None
 
 
 def do_deploy(archive_path):
     """
-    Distributes archives to web servers
-    Args:
-        archive_path: path to local archive to be uploaded
+    Distributes an archive to web servers
     """
-    if not path.exists(archive_path):
+    if not os.path.exists(archive_path):
         return False
-    compressedFile = archive_path.split("/")[-1]
-    fileName = compressedFile.split(".")[0]
-    upload_path = "/tmp/{}".format(compressedFile)
-    if put(archive_path, upload_path).failed:
+
+    try:
+        archive_name = os.path.basename(archive_path)
+        folder_name = "/data/web_static/releases/" + archive_name.split(".")[0]
+        put(archive_path, "/tmp/")
+        run("mkdir -p {}".format(folder_name))
+        run("tar -xzf /tmp/{} -C {}".format(archive_name, folder_name))
+        run("rm /tmp/{}".format(archive_name))
+        run("mv {}/web_static/* {}/".format(folder_name, folder_name))
+        run("rm -rf {}/web_static".format(folder_name))
+        run("rm -rf /data/web_static/current")
+        run("ln -s {} /data/web_static/current".format(folder_name))
+        print("New version deployed!")
+        return True
+    except:
         return False
-    current_release = '/data/web_static/releases/{}'.format(fileName)
-    if run("rm -rf {}".format(current_release)).failed:
-        return False
-    if run("mkdir {}".format(current_release)).failed:
-        return False
-    uncompress = "tar -xzf /tmp/{} -C {}".format(
-        compressedFile, current_release
-    )
-    if run(uncompress).failed:
-        return False
-    delete_archive = "rm -f /tmp/{}".format(compressedFile)
-    if run(delete_archive).failed:
-        return False
-    if run("rm -rf /data/web_static/current").failed:
-        return False
-    relink = "ln -s {} /data/web_static/current".format(current_release)
-    if run(relink).failed:
-        return False
-    return True
 
 
 def deploy():
     """
-    Creates and distributes an archive to your web servers
+    Creates and distributes an archive to web servers
     """
     archive_path = do_pack()
     if archive_path is None:
         return False
     return do_deploy(archive_path)
+
