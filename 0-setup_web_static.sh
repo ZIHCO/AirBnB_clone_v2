@@ -8,35 +8,46 @@ if [ "$(dpkg -s nginx &> /dev/null)" -ne 0 ] ; then
 	sudo apt install nginx -y
 fi
 
-if  [ ! -d /data ]; then
+[ -d /data ]
+
+if [ $? -ne 0 ] ; then
 	sudo mkdir /data
 fi
 
-if [ ! -d /data/web_static ] ; then
+[ -d /data/web_static ]
+
+if [ $? -ne 0 ] ; then
 	sudo mkdir /data/web_static
 fi
 
-if [ ! -d /data/web_static/releases ] ; then
+[ -d /data/web_static/releases ]
+
+if [ $? -ne 0 ] ; then
 	sudo mkdir /data/web_static/releases
 fi
 
-if [ ! -d /data/web_static/shared ] ; then
+[ -d /data/web_static/shared ]
+
+if [ $? -ne 0 ] ; then
 	sudo mkdir /data/web_static/shared
 fi
 
-if [ ! -d /data/web_static/releases/test ] ; then
+[ -d /data/web_static/releases/test/ ]
+
+if [ $? -ne 0 ] ; then
 	sudo mkdir /data/web_static/releases/test/
 fi
 
 sudo echo "Hello World!!" > /data/web_static/releases/test/index.html
 
-if [ ! -L /data/web_static/current ] ; then
+[ -L /data/web_static/current ]
+
+if [ $? -ne 0 ] ; then
 	sudo ln -s /data/web_static/releases/test/ /data/web_static/current
 else
 	rm /data/web_static/current
 	sudo ln -s /data/web_static/releases/test/ /data/web_static/current
 fi
-
 sudo chown -R ubuntu:ubuntu /data
 
 sudo sed -i "s|server_name _;|server_name zihco.tech;\n\tlocation /hbnb_static {\n\t\talias /data/web_static/current/;\n\t\tautoindex off;\n\t}|" /etc/nginx/sites-available/default
