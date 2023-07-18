@@ -8,29 +8,29 @@ if [ "$(dpkg -s nginx &> /dev/null)" -ne 0 ] ; then
 	sudo apt install nginx -y
 fi
 
-if ! [ -d /data ] ; then
+if  [ ! -d /data ]; then
 	sudo mkdir /data
 fi
 
-if ! [ -d /data/web_static ] ; then
+if [ ! -d /data/web_static ] ; then
 	sudo mkdir /data/web_static
 fi
 
-if ! [ -d /data/web_static/releases ] ; then
+if [ ! -d /data/web_static/releases ] ; then
 	sudo mkdir /data/web_static/releases
 fi
 
-if ! [ -d /data/web_static/shared ] ; then
+if [ ! -d /data/web_static/shared ] ; then
 	sudo mkdir /data/web_static/shared
 fi
 
-if ! [ -d /data/web_static/releases/test ] ; then
+if [ ! -d /data/web_static/releases/test ] ; then
 	sudo mkdir /data/web_static/releases/test/
 fi
 
 sudo echo "Hello World!!" > /data/web_static/releases/test/index.html
 
-if ! [ -L /data/web_static/current ] ; then
+if [ ! -L /data/web_static/current ] ; then
 	sudo ln -s /data/web_static/releases/test/ /data/web_static/current
 else
 	rm /data/web_static/current
