@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Script sets up web servers for deployment of web_static.
 
-# dpkg -s nginx &> /dev/null
+dpkg -s nginx &> /dev/null
 
-if [ "$(dpkg -s nginx &> /dev/null)" -ne 0 ] ; then
+if [ $? -ne 0 ] ; then
 	sudo apt update
 	sudo apt install nginx -y
 fi
