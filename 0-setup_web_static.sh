@@ -28,7 +28,7 @@ if ! [ -d /data/web_static/releases/test ] ; then
 	sudo mkdir /data/web_static/releases/test/
 fi
 
-sudo echo "Hello World!!" | /data/web_static/releases/test/index.html
+sudo echo "Hello World!!" > /data/web_static/releases/test/index.html
 
 if ! [ -L /data/web_static/current ] ; then
 	sudo ln -s /data/web_static/releases/test/ /data/web_static/current
