@@ -8,18 +8,6 @@ from datetime import datetime
 env.hosts = ['100.26.121.248', '18.234.107.186']
 
 
-def deploy():
-    """this definition calls do_deploy and do_pack"""
-
-    path = do_pack()
-
-    if not path:
-        return False
-
-    deploy = do_deploy(path)
-    return deploy
-
-
 def do_pack():
     """Archive the contents of web-static into a .tgz file."""
     directory = "versions"
@@ -60,3 +48,15 @@ def do_deploy(archive_path):
     run("ln -s " + uncompress_file_path + " /data/web_static/current")
 
     return True
+
+
+def deploy():
+    """this definition calls do_deploy and do_pack"""
+
+    path = do_pack()
+
+    if not path:
+        return False
+
+    deploy = do_deploy(path)
+    return deploy
