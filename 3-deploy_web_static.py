@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 """This module is a fabfile"""
-from fabric.api import put, run, cd, env, lcd, local
+from fabric.api import put, run, cd, env, lcd, local, runs_once
 import os
 import tarfile
 from datetime import datetime
 
 env.hosts = ['100.26.121.248', '18.234.107.186']
 
-
+@runs_once
 def do_pack():
     """Archive the contents of web-static into a .tgz file."""
     directory = "versions"
