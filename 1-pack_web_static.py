@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+"""This module is a fabric script"""
 from fabric.api import task, lcd, local
 import tarfile
 import os
