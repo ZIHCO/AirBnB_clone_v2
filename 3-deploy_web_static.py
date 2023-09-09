@@ -7,6 +7,7 @@ from datetime import datetime
 
 env.hosts = ['100.26.121.248', '18.234.107.186']
 
+
 @runs_once
 def do_pack():
     """Archive the contents of web-static into a .tgz file."""
