@@ -40,11 +40,10 @@ def python_route(text="is cool"):
     return escape(string)
 
 
-@app.route("/number/<text>", strict_slashes=False)
+@app.route("/number/<int:text>", strict_slashes=False)
 def number_route(text):
     """dynamic route"""
-    if type(int(text)) is int:
-        return "{} is a number".format(text)
+    return "{} is a number".format(text)
 
 
 if __name__ == "__main__":
