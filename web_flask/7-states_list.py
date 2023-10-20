@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 """script starts a flask web app"""
 from flask import Flask
+from flask import render_template
 from models import storage
 from models.state import State
-from flask import render_template
 
 app = Flask(__name__)
 
