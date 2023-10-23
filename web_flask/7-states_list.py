@@ -10,11 +10,13 @@ app = Flask(__name__)
 
 @app.teardown_appcontext
 def teardown(self):
+    """tears down app"""
     storage.close()
 
 
 @app.route("/states_list", strict_slashes=False)
 def states_list():
+    """route states"""
     states = storage.all(State).values()
     return render_template('7-states_list.html', states=states)
 
